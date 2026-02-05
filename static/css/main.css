@@ -1,0 +1,43 @@
+html{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+body{
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    background-color: rgb(231, 249, 252);
+}
+#main-button{
+    padding-left: 55px;
+    padding-right: 55px;
+}
+.button.active {
+    background-color: #17a2b8;
+    color: #fff;
+}
+.button:hover {
+    background-color: #b2d6dc; /* New background color when hovering */
+}
+.table-container {
+    margin-top: 20px;
+    display: none;
+}
+
+.table.active {
+    display: block;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 10px;
+}
+th {
+    font-size: large;
+}
+tr {
+    font-size: large;
+}
+#form-container{
+    border-color: #17a2b8;
+    border-width: 3px;
+    border-style: solid;
+}

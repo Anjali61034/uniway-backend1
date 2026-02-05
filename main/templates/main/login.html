@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+          integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"
+          crossorigin="anonymous">
+
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: rgb(201, 221, 239);
+        }
+
+        .user_card {
+            width: 400px;
+            margin-top: auto;
+            margin-bottom: auto;
+            background: rgb(61, 73, 120);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+        }
+
+        .form_container {
+            margin-top: 20px;
+        }
+
+        #form-title {
+            color: #fff;
+            background-color: rgb(27, 33, 57);
+            padding: 10px;
+            margin: 0;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .login_btn {
+            width: 100%;
+            background-color: #041541;
+            color: white;
+            border: none;
+            padding: 10px;
+        }
+
+        .login_btn:hover {
+            width: 100%;
+            background-color: #b3bed8;
+            color: #000;
+        }
+
+        .login_btn:focus {
+            box-shadow: none !important;
+            outline: 0px !important;
+        }
+
+        .login_container {
+            padding: 0 2rem;
+        }
+
+        .input-group-text {
+            background: #041541 !important;
+            color: white !important;
+            border: 0 !important;
+            border-radius: 0.25rem 0 0 0.25rem !important;
+        }
+
+        .form-control {
+            border-radius: 0 0.25rem 0.25rem 0 !important;
+            border: 1px solid #ced4da;
+        }
+
+        .captcha-wrapper {
+            margin-bottom: 15px;
+        }
+
+        .captcha-wrapper input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            margin-bottom: 10px;
+        }
+
+        .captcha-wrapper img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.25rem;
+            background: white;
+        }
+
+        .input_user,
+        .input_pass:focus {
+            box-shadow: none !important;
+            outline: 0px !important;
+        }
+
+        .text-danger {
+            font-size: 0.875rem;
+            margin-bottom: 5px;
+            color: #ff6b6b;
+        }
+
+        .input-group {
+            flex-wrap: nowrap;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container h-100">
+    <div class="d-flex justify-content-center h-100">
+        <div class="user_card">
+            <div class="d-flex flex-column align-items-center">
+                <h3 style="margin: 0; margin-top: -20px;" id="form-title">Uniway Backend</h3><br>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <h3>LOGIN</h3>
+            </div>
+            <div class="d-flex justify-content-center form_container">
+                <form method="POST" action="" style="width: 100%;">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Username -->
+                    {% if form.username.errors %}
+                    <div class="text-danger">{{ form.username.errors }}</div>
+                    {% endif %}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        <input type="text" name="username" class="form-control input_user" placeholder="Username" required>
+                    </div>
+
+                    <!-- Password -->
+                    {% if form.password.errors %}
+                    <div class="text-danger">{{ form.password.errors }}</div>
+                    {% endif %}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        </div>
+                        <input type="password" name="password" class="form-control input_pass" placeholder="Password" required>
+                    </div>
+
+                    <!-- Captcha -->
+                    {% if form.captcha.errors %}
+                    <div class="text-danger">{{ form.captcha.errors }}</div>
+                    {% endif %}
+                    <div class="captcha-wrapper">
+                        {{ form.captcha }}
+                    </div>
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger">
+                        <strong>{{ message }}</strong>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <div class="d-flex justify-content-center mt-3 login_container">
+                        <input class="btn login_btn" type="submit" value="Login">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

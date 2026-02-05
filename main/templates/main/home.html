@@ -1,0 +1,195 @@
+{% extends 'main/base.html' %}
+
+
+{% block content %}
+{% load static %}
+{% load widget_tweaks %}
+
+
+<br>
+<h3>Add entry: </h3>
+<div class="card card-body">
+    <div class="row">
+        <div class="col-3">
+            <a class="btn btn-info btn-block" href="{% url 'create-notice' %}">Notices/Updates</a>
+        </div>
+        <div class="col-3">
+            <a class="btn btn-info btn-block" href="{% url 'create-competition' %}">Events/Competitions</a>
+        </div>
+        <div class="col-3">
+            <a class="btn btn-info btn-block" href="{% url 'create-seminar' %}">Seminars</a>
+        </div>
+        <div class="col-3">
+            <a class="btn btn-info btn-block" href="{% url 'create-fest' %}">Fests</a>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-4">
+            <a class="btn btn-info btn-block" href="{% url 'create-survey' %}">Surveys</a>
+        </div>
+        <div class="col-4">
+            <a class="btn btn-info btn-block" href="{% url 'create-student-initiative' %}">Student Initiatives</a>
+        </div>
+        <div class="col-4">
+            <a class="btn btn-info btn-block" href="{% url 'create-alumni' %}">Alumnae</a>
+        </div>
+    </div>
+</div>
+<br>
+<hr>
+<h3>View your entries:</h3>
+
+<div class="card card-body">
+    <div class="row" style="padding-left: 20px;">
+        <div id="main-button" class="btn button" data-model="notices" onclick="showTable('notices')">Notices and Updates</div>
+        <div id="main-button" class="btn button" data-model="competitions" onclick="showTable('competitions')">Events and Competitions</div>
+        <div id="main-button" class="btn button" data-model="seminars" onclick="showTable('seminars')">Seminars</div>
+        <div id="main-button" class="btn button" data-model="fests" onclick="showTable('fests')">Fests</div>
+        <div id="main-button" class="btn button" data-model="surveys" onclick="showTable('surveys')">Surveys</div>
+        <div id="main-button" class="btn button" data-model="student_initiatives" onclick="showTable('student_initiatives')">Student Initiatives</div>
+        <div id="main-button" class="btn button" data-model="alumni" onclick="showTable('alumni')">Alumnae</div>
+    </div>
+</div>
+
+<div id="table-notices" class="table-container">
+    <div class="card card-body">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+            {% for notice in notices %}
+            <tr>
+                <td>{{ notice.heading }}</td> 
+                <td><a class="btn btn-info" href="{% url 'update-notice' notice.id %}">Update</a></td>
+                <td><a class="btn btn-danger" href="{% url 'delete-notice' notice.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div id="table-competitions" class="table-container">
+    <div class="card card-body">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+            {% for competition in competitions %}
+            <tr>
+                <td>{{ competition.name }}</td> 
+                <td><a class="btn btn-info" href="{% url 'update-competition' competition.id %}">Update</a></td>
+                <td><a class="btn btn-danger" href="{% url 'delete-competition' competition.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+   
+<div id="table-seminars" class="table-container">
+    <div class="card card-body">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+            {% for seminar in seminars %}
+            <tr>
+                <td>{{ seminar.name }}</td>
+                <td>{{ seminar.date|date:"d/m/Y" }}</td>
+                <td><a class="btn btn-info" href="{% url 'update-seminar' seminar.id %}">Update</a></td>
+                <td><a class="btn btn-danger" href="{% url 'delete-seminar' seminar.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div id="table-fests" class="table-container">
+    <div class="card card-body">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+            {% for fest in fests %}
+            <tr>
+                <td>{{ fest.name }}</td>
+                <td>{{ fest.date|date:"d/m/Y" }}</td> 
+                <td><a class="btn btn-info" href="{% url 'update-fest' fest.id %}">Update</a></td>
+                <td><a class="btn btn-danger" href="{% url 'delete-fest' fest.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div id="table-surveys" class="table-container">
+    <div class="card card-body">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+            {% for survey in surveys %}
+            <tr>
+                <td>{{ survey.name }}</td>
+                <td><a class="btn btn-info" href="{% url 'update-survey' survey.id %}">Update</a></td>
+                <td><a class="btn btn-danger" href="{% url 'delete-survey' survey.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div id="table-student_initiatives" class="table-container">
+    <div class="card card-body">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Student name</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+            {% for student_initiative in student_initiatives %}
+            <tr>
+                <td>{{ student_initiative.name }}</td>
+                <td>{{ student_initiative.student_name }}</td>
+                <td><a class="btn btn-info" href="{% url 'update-student-initiative' student_initiative.id %}">Update</a></td>
+                <td><a class="btn btn-danger" href="{% url 'delete-student-initiative' student_initiative.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div id="table-alumni" class="table-container">
+    <div class="card card-body">
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Batch</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+            {% for alum in alumnae %}
+            <tr>
+                <td>{{ alum.name }}</td>
+                <td>{{ alum.batch }}</td>
+                <td><a class="btn btn-info" href="{% url 'update-alumni' alum.id %}">Update</a></td>
+                <td><a class="btn btn-danger" href="{% url 'delete-alumni' alum.id %}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

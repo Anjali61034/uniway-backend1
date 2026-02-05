@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<br>
+<h4>Logs:</h4>
+<table>
+    {% for entry in log_entries %}
+    <tr style="border: 1px solid black;">
+      <td style="padding: 10px;">{{ entry }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

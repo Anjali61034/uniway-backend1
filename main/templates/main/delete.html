@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<br><br>
+<div class="card card-body">
+    <h4>Are you sure you want to delete { {{ instance }} }? This action cannot be reversed.</h4>
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+        <a style="padding-left: 30px;padding-right: 30px;margin: 20px; margin-left: 50px;" class="btn btn-info" href="{% url 'home' %}">Cancel</a>
+        <input style="padding-left: 30px;padding-right: 30px;margin: 20px" class="btn btn-danger" type="submit" value="Delete">
+    </form>
+</div>
+{% endblock %}

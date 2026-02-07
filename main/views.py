@@ -319,10 +319,6 @@ def create_seminar(request):
                 created_by=request.user
             )
 
-            # Send notification
-            notification_service.send_notification(
-                'seminar', name, seminar.id, request.user
-            )
 
             logger.info(f'{request.user} created an entry - {name}, in Seminars.')
             return redirect('/')

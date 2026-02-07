@@ -1,36 +1,29 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-import os
-from django.conf import settings
-
-
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import FCMDevice
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework import status
-from django.views.decorators.csrf import csrf_exempt
-from .models import UserFCMToken, NotificationPreference
-from .notification_service import notification_service
-
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from rest_framework import viewsets
-
-from .models import *
-from .forms import *
-from.helpers import *
-from .decorators import *
-from .serializers import *
-
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import os
 import fitz
 from io import BytesIO
 from PIL import Image
 from django.core.files.base import ContentFile
+from firebase_admin import messaging
+from django.http import JsonResponse
+
+# Local imports
+from .models import *
+from .forms import *
+from .helpers import *
+from .decorators import *
+from .serializers import *
+from .notification_service import notification_service
 
 import logging
 logger = logging.getLogger('uniway-backend')
@@ -137,9 +130,10 @@ def create_notice(request):
         form = NoticeForm(request.POST, request.FILES)
         if form.is_valid():
             heading = form.cleaned_data.get('heading')
+            description = form.cleaned_data.get('description') # ADDED
             notice_img = form.cleaned_data.get('notice_img')
             removal_date = form.cleaned_data.get('removal_date')
-            if notice_img.content_type == 'application/pdf':
+            if notice_img and notice_img.content_type == 'application/pdf':
                 pdf_document = fitz.open(stream=notice_img.read(), filetype='pdf')
                 pdf_page = pdf_document.load_page(0)  # Load the first page
                 pdf_image = pdf_page.get_pixmap()
@@ -151,6 +145,7 @@ def create_notice(request):
                 notice_img = ContentFile(image_io.read(), name=png_name)
             notice = Notice.objects.create(
                 heading=heading,
+                description=description, # ADDED
                 notice_img=notice_img,
                 removal_date=removal_date,
                 created_by=request.user,
@@ -291,6 +286,7 @@ def create_seminar(request):
 
         if form.is_valid():
             name = form.cleaned_data.get('name')
+            description = form.cleaned_data.get('description') # ADDED
             date = form.cleaned_data.get('date')
             link = form.cleaned_data.get('link')
             poster = form.cleaned_data.get('poster')
@@ -317,6 +313,7 @@ def create_seminar(request):
                 name=name,
                 date=date,
                 department=dept,
+                description=description, # ADDED
                 link=link,
                 poster=poster,
                 created_by=request.user
@@ -601,7 +598,7 @@ def create_alum(request):
                 department=dept,
                 batch=batch,
                 information=info,
-		        linkedin_link=link,
+                linkedin_link=link,
                 picture=picture
                 )
             alumni.save()
@@ -661,10 +658,6 @@ class competition_view_set(viewsets.ModelViewSet):
         current_date = timezone.now().date()
         queryset = Competition.objects.filter(date__gte=current_date).order_by('-date_created')[:100]
         return queryset
-
-    # @read_only_scope
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
 
 class survey_view_set(viewsets.ModelViewSet):
     queryset = Survey.objects.order_by('-date_created')[:100]
@@ -794,13 +787,6 @@ def update_notification_preferences(request):
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
-from firebase_admin import messaging
-from django.http import JsonResponse
-from .models import UserFCMToken
-
-
 def send_test_notification(request):
     tokens = list(
         UserFCMToken.objects
@@ -830,4 +816,4 @@ def send_test_notification(request):
         "success": response.success_count,
         "failure": response.failure_count,
     })
-
+    

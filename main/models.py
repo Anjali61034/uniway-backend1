@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
@@ -10,12 +11,27 @@ from django.dispatch import receiver
 
 logger = logging.getLogger('uniway-backend')
 
+# --- Custom Validator for Word Count ---
+def validate_description_length(value):
+    """
+    Validates that the description is between 6 and 70 words.
+    """
+    if value:
+        word_count = len(value.split())
+        if word_count < 0 or word_count > 70:
+            raise ValidationError(
+                f'Description must be between 6 and 70 words. '
+                f'Currently it contains {word_count} words.'
+            )
+
 class CustomToken(Token):
     READ_ONLY_SCOPE = 'read_only'
     scope = models.CharField(max_length=20, default=READ_ONLY_SCOPE)
 
 class Notice(models.Model):
     heading = models.CharField(max_length=150, null=True, blank=True)
+    # ADDED: Description field with 6-70 word limit
+    description = models.TextField(null=True, blank=True, validators=[validate_description_length])
     notice_img = models.FileField(upload_to="notices", default="default-poster.png", null=True, blank=True)
     removal_date = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
@@ -27,7 +43,8 @@ class Notice(models.Model):
 class Competition(models.Model):
     name = models.CharField(max_length=150, null=True, blank=True)
     department = models.CharField(max_length=250, null=True, blank=True)
-    description = models.CharField(max_length=300, null=True, blank=True)
+    # CHANGED: Converted to TextField with word limit validator
+    description = models.TextField(null=True, blank=True, validators=[validate_description_length])
     date = models.DateField(null=True, blank=True)
     link = models.URLField(max_length=300, null=True, blank=True) 
     poster = models.ImageField(upload_to="updates", default="default-poster.png", null=True, blank=True)
@@ -40,7 +57,8 @@ class Competition(models.Model):
 class Survey(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)
     department = models.CharField(max_length=250, null=True, blank=True)
-    description = models.CharField(max_length=300, null=True, blank=True)
+    # CHANGED: Converted to TextField with word limit validator
+    description = models.TextField(null=True, blank=True, validators=[validate_description_length])
     link = models.URLField(max_length=300, null=True, blank=True) 
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -51,7 +69,8 @@ class Survey(models.Model):
 class Fest(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)
     department = models.CharField(max_length=250, null=True, blank=True)
-    description = models.CharField(max_length=300, null=True, blank=True)
+    # CHANGED: Converted to TextField with word limit validator
+    description = models.TextField(null=True, blank=True, validators=[validate_description_length])
     date = models.DateField(null=True, blank=True)
     poster = models.ImageField(upload_to="fests", default="default-poster.png", null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
@@ -65,10 +84,10 @@ class Seminar(models.Model):
     department = models.CharField(max_length=250, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     
-    # CHANGED: Removed default="", so it saves as NULL in DB if empty
-    # CHANGED: Increased max_length to 300 for safety
-    link = models.URLField(max_length=300, null=True, blank=True) 
+    # ADDED: Description field with 6-70 word limit
+    description = models.TextField(null=True, blank=True, validators=[validate_description_length])
     
+    link = models.URLField(max_length=300, null=True, blank=True) 
     poster = models.ImageField(upload_to="seminars", default="default-poster.png", null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -80,7 +99,8 @@ class StudentInitiative(models.Model):
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=100, null=True, blank=True)
     student_name = models.CharField(max_length=50, null=True, blank=True)
-    description = models.CharField(max_length=300, null=True, blank=True)
+    # CHANGED: Converted to TextField with word limit validator
+    description = models.TextField(null=True, blank=True, validators=[validate_description_length])
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
@@ -149,7 +169,7 @@ class NotificationLog(models.Model):
 # Auto-send notifications when events are created via Django admin
 @receiver(post_save, sender=Notice)
 def notice_created_signal(sender, instance, created, **kwargs):
-    if created:  # Only when new notice is created
+    if created:
         logger.info(f"Signal: New notice created: {instance.heading}")
         try:
             from .notification_service import notification_service
@@ -251,8 +271,6 @@ def alumni_created_signal(sender, instance, created, **kwargs):
             )
         except Exception as e:
             logger.error(f"Error sending alumni notification: {e}")
-
-from django.contrib.auth.models import User
 
 class FCMDevice(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

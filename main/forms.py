@@ -37,10 +37,13 @@ class UserForm(UserCreationForm):
 class NoticeForm(ModelForm):
     class Meta:
         model = Notice
-        fields = ['heading', 'notice_img', 'removal_date']
+        # ADDED: 'description' to fields
+        fields = ['heading', 'description', 'notice_img', 'removal_date']
         widgets = {
             'removal_date': forms.DateInput(attrs={'type': 'date'}),
             'notice_img': ClearableFileInput(attrs={'accept': 'image/png, image/jpeg, application/pdf'}),
+            # ADDED: Textarea widget for description
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Enter description (0-70 words)...'}),
         }
         help_texts = {
             'notice_img': 'Upload Notice (Max size: 5MB)',
@@ -70,6 +73,8 @@ class CompetitionForm(ModelForm):
         fields = ['department', 'name', 'description', 'date', 'link', 'poster']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+            # ADDED: Textarea widget for description
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Enter description (0-70 words)...'}),
         }
         help_texts = {
             'department': 'Only enter the dept if your username is not your dept name',
@@ -95,6 +100,10 @@ class SurveyForm(ModelForm):
     class Meta:
         model = Survey
         fields = ['department', 'name', 'description', 'link']
+        # ADDED: Textarea widget for description
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Enter description (0-70 words)...'}),
+        }
         help_texts = {
             'department': 'Only enter the dept if your username is not your dept name',
         }
@@ -114,6 +123,8 @@ class FestForm(ModelForm):
         fields = ['department', 'name', 'description', 'date', 'poster']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+            # ADDED: Textarea widget for description
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Enter description (0-70 words)...'}),
         }
         help_texts = {
             'department': 'Only enter the dept if your username is not your dept name',
@@ -141,9 +152,12 @@ class SeminarForm(ModelForm):
 
     class Meta:
         model = Seminar
-        fields = ['department', 'name', 'date', 'link', 'poster']
+        # ADDED: 'description' to fields
+        fields = ['department', 'name', 'description', 'date', 'link', 'poster']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+            # ADDED: Textarea widget for description
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Enter description (0-70 words)...'}),
         }
         help_texts = {
             'department': 'Only enter the dept if your username is not your dept name',
@@ -153,10 +167,11 @@ class SeminarForm(ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         name = cleaned_data.get('name')
+        description = cleaned_data.get('description') # Get description
         date = cleaned_data.get('date')
         poster = cleaned_data.get('poster')
 
-        # 2. Link is not checked here, so it can be empty
+        # 2. Link is not checked here, so it can be empty. Description checked here (optional, model validator handles strictness)
         if not name or not date or not poster:
             raise forms.ValidationError('Please fill in Name, Date, and Poster.')
         
@@ -168,6 +183,10 @@ class StudentInitiativeForm(ModelForm):
     class Meta:
         model = StudentInitiative
         fields = ['name', 'student_name', 'description']
+        # ADDED: Textarea widget for description
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Enter description (0-70 words)...'}),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -182,6 +201,10 @@ class AlumniForm(ModelForm):
     class Meta:
         model = Alumni
         fields = ['department', 'name', 'batch', 'information', 'linkedin_link', 'picture']
+        # ADDED: Textarea widget for information (Alumni uses 'information' instead of 'description')
+        widgets = {
+            'information': forms.Textarea(attrs={'rows': 4}),
+        }
         help_texts = {
             'batch': 'Enter full year. Example: 2020',
             'department': 'Only enter the dept if your username is not your dept name',
@@ -206,4 +229,3 @@ class AlumniForm(ModelForm):
 
         if not name or not batch or not information or not picture:
             raise forms.ValidationError('All fields must be filled out.')
-        

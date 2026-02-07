@@ -15,7 +15,7 @@ class CustomToken(Token):
     scope = models.CharField(max_length=20, default=READ_ONLY_SCOPE)
 
 class Notice(models.Model):
-    heading = models.CharField(max_length=100, null=True, blank=True)
+    heading = models.CharField(max_length=150, null=True, blank=True)
     notice_img = models.FileField(upload_to="notices", default="default-poster.png", null=True, blank=True)
     removal_date = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
@@ -25,11 +25,11 @@ class Notice(models.Model):
         return self.heading
 
 class Competition(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    department = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=150, null=True, blank=True)
+    department = models.CharField(max_length=250, null=True, blank=True)
     description = models.CharField(max_length=300, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
-    link = models.URLField(max_length=200, null=True, blank=True) 
+    link = models.URLField(max_length=300, null=True, blank=True) 
     poster = models.ImageField(upload_to="updates", default="default-poster.png", null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -38,10 +38,10 @@ class Competition(models.Model):
         return f"{self.department} - {self.name}"
 
 class Survey(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    department = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=250, null=True, blank=True)
+    department = models.CharField(max_length=250, null=True, blank=True)
     description = models.CharField(max_length=300, null=True, blank=True)
-    link = models.URLField(max_length=200, null=True, blank=True) 
+    link = models.URLField(max_length=300, null=True, blank=True) 
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
@@ -49,8 +49,8 @@ class Survey(models.Model):
         return f"{self.department} - {self.name}"
 
 class Fest(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    department = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=250, null=True, blank=True)
+    department = models.CharField(max_length=250, null=True, blank=True)
     description = models.CharField(max_length=300, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     poster = models.ImageField(upload_to="fests", default="default-poster.png", null=True, blank=True)
@@ -61,13 +61,13 @@ class Fest(models.Model):
         return f"{self.name} - {self.department}"
 
 class Seminar(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    department = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=250, null=True, blank=True)
+    department = models.CharField(max_length=250, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     
     # CHANGED: Removed default="", so it saves as NULL in DB if empty
-    # CHANGED: Increased max_length to 200 for safety
-    link = models.URLField(max_length=200, null=True, blank=True) 
+    # CHANGED: Increased max_length to 300 for safety
+    link = models.URLField(max_length=300, null=True, blank=True) 
     
     poster = models.ImageField(upload_to="seminars", default="default-poster.png", null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
@@ -89,10 +89,10 @@ class StudentInitiative(models.Model):
 class Alumni(models.Model):
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=100, null=True, blank=True)
-    department = models.CharField(max_length=50, null=True, blank=True)
+    department = models.CharField(max_length=150, null=True, blank=True)
     batch = models.IntegerField(null=True, blank=True)
     information = models.CharField(max_length=300, null=True, blank=True)
-    linkedin_link = models.URLField(default="", max_length=100, null=True, blank=True)
+    linkedin_link = models.URLField(default="", max_length=150, null=True, blank=True)
     picture = models.ImageField(upload_to="alum", default="default-poster.png", null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
@@ -134,7 +134,7 @@ class NotificationLog(models.Model):
     """Log sent notifications for tracking"""
     title = models.CharField(max_length=200)
     body = models.TextField()
-    event_type = models.CharField(max_length=50)
+    event_type = models.CharField(max_length=150)
     event_id = models.IntegerField()
     recipients_count = models.IntegerField(default=0)
     success_count = models.IntegerField(default=0)

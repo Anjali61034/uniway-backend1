@@ -285,35 +285,58 @@ def delete_competition(request, pk):
 @login_required(login_url='login')
 def create_seminar(request):
     form = SeminarForm()
+
     if request.method == 'POST':
         form = SeminarForm(request.POST, request.FILES)
+
         if form.is_valid():
             name = form.cleaned_data.get('name')
             date = form.cleaned_data.get('date')
             link = form.cleaned_data.get('link')
             poster = form.cleaned_data.get('poster')
             department = form.cleaned_data.get('department')
+
+            # Build department string
             if not department:
                 user = str(request.user)
                 user = convert_to_dept_name(user).title()
                 dept = f"Department of {user}"
             else:
                 dept = f"Department of {department.title()}"
+
+            # ✅ SAFETY CHECK (prevents varchar(50/100) crash)
+            if len(dept) > 100:
+                form.add_error('department', 'Department name is too long')
+                return render(request, 'main/form.html', {
+                    'form': form,
+                    'seminar_form': True
+                })
+
+            # Create seminar (create() already saves)
             seminar = Seminar.objects.create(
                 name=name,
                 date=date,
                 department=dept,
-		        link=link,
+                link=link,
                 poster=poster,
                 created_by=request.user
-                )
-            seminar.save()
+            )
+
+            # Send notification
+            notification_service.send_notification(
+                'seminar', name, seminar.id, request.user
+            )
+
             logger.info(f'{request.user} created an entry - {name}, in Seminars.')
             return redirect('/')
+
         else:
             logger.warning(f'{request.user} was unable to create an entry in Seminars.')
-    context = {'form': form,
-               'seminar_form': True}
+
+    context = {
+        'form': form,
+        'seminar_form': True
+    }
     return render(request, 'main/form.html', context)
 
 @login_required(login_url='login')
